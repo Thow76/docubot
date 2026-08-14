@@ -171,7 +171,7 @@ class NotificationService {
     debugPrint('DEBUG: Attempting immediate test notification');
     await _plugin.show(
       0,
-      'DocSafe Test',
+      'DocuBot Test',
       'If you see this, notifications are working',
       const NotificationDetails(
         android: AndroidNotificationDetails(
@@ -194,7 +194,7 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       99999,
-      'DocSafe Scheduled Test',
+      'DocuBot Scheduled Test',
       'Scheduled notification is working',
       fireDate,
       const NotificationDetails(
