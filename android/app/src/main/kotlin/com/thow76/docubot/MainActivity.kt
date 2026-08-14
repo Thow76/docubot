@@ -1,4 +1,4 @@
-package com.example.document_organisation
+package com.thow76.docubot
 
 import io.flutter.embedding.android.FlutterActivity
 
