@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .env
+
+# T-001 phone data export (real user data, never commit)
+/data-migration/

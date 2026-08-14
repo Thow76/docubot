@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/document_provider.dart';
 import '../services/ai_service.dart';
+import '../services/notification_service.dart'; // DEBUG: REMOVE BEFORE RELEASE
 import '../theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -129,6 +130,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           actions: [
+            // DEBUG: REMOVE BEFORE RELEASE
+            IconButton(
+              icon: const Icon(Icons.bug_report),
+              tooltip: 'Test immediate notification',
+              onPressed: () => NotificationService.instance.showTestNotification(),
+            ),
+            // DEBUG: REMOVE BEFORE RELEASE
+            IconButton(
+              icon: const Icon(Icons.schedule),
+              tooltip: 'Test scheduled notification',
+              onPressed: () => NotificationService.instance.showScheduledTestNotification(),
+            ),
             IconButton(
               icon: const Icon(Icons.notifications),
               onPressed: () {},

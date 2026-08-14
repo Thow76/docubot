@@ -114,7 +114,7 @@ class _DocumentViewerScreenState extends State<DocumentViewerScreen> {
                     child: Image.file(
                       File(document.imagePath),
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Column(
+                      errorBuilder: (_, _, _) => const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(

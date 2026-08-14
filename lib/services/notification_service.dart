@@ -52,12 +52,24 @@ class NotificationService {
   /// (actionableDate − notifyDaysBefore). Skips silently if that date is in
   /// the past.
   Future<void> scheduleReminder(Reminder reminder, String documentTitle) async {
+    // DEBUG: REMOVE BEFORE RELEASE
+    debugPrint('DEBUG: scheduleReminder() called for reminder ${reminder.id} ("$documentTitle")');
+    debugPrint('DEBUG:   actionableDate = ${reminder.actionableDate}');
+    debugPrint('DEBUG:   notifyDaysBefore = ${reminder.notifyDaysBefore}');
+
     final notifyDate = reminder.actionableDate.subtract(
       Duration(days: reminder.notifyDaysBefore),
     );
 
+    // DEBUG: REMOVE BEFORE RELEASE
+    debugPrint('DEBUG:   calculated fire date = $notifyDate');
+
     final now = DateTime.now();
-    if (notifyDate.isBefore(now)) return;
+    if (notifyDate.isBefore(now)) {
+      // DEBUG: REMOVE BEFORE RELEASE
+      debugPrint('DEBUG WARNING: Fire date is in the past — notification will not be delivered (fireDate=$notifyDate, now=$now)');
+      return;
+    }
 
     final scheduledDate = tz.TZDateTime(
       tz.local,
@@ -67,7 +79,14 @@ class NotificationService {
       9, // 9:00 AM
     );
 
-    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
+    // DEBUG: REMOVE BEFORE RELEASE
+    debugPrint('DEBUG:   TZDateTime to pass to zonedSchedule = $scheduledDate');
+
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
+      // DEBUG: REMOVE BEFORE RELEASE
+      debugPrint('DEBUG WARNING: Fire date is in the past — notification will not be delivered (scheduledDate=$scheduledDate)');
+      return;
+    }
 
     try {
       await _plugin.zonedSchedule(
@@ -78,6 +97,8 @@ class NotificationService {
         _notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
+      // DEBUG: REMOVE BEFORE RELEASE
+      debugPrint('DEBUG: zonedSchedule() completed for reminder ${reminder.id} at $scheduledDate');
     } catch (e) {
       debugPrint('Failed to schedule notification: $e');
     }
@@ -107,16 +128,87 @@ class NotificationService {
     List<Reminder> reminders,
     List<Document> documents,
   ) async {
+    // DEBUG: REMOVE BEFORE RELEASE
+    final activeReminders = reminders.where((r) => !r.isCompleted).toList();
+    debugPrint('DEBUG: rescheduleAllReminders() called — ${reminders.length} total reminders, ${activeReminders.length} active');
+
     await _plugin.cancelAll();
+    // DEBUG: REMOVE BEFORE RELEASE
+    debugPrint('DEBUG: cancelAll() completed');
 
     final docMap = {for (final d in documents) d.id: d};
 
+    // DEBUG: REMOVE BEFORE RELEASE
+    int scheduled = 0;
+    int skippedCompleted = 0;
+    int skippedNoDoc = 0;
+
     for (final reminder in reminders) {
-      if (reminder.isCompleted) continue;
+      if (reminder.isCompleted) {
+        // DEBUG: REMOVE BEFORE RELEASE
+        skippedCompleted++;
+        debugPrint('DEBUG:   Skipping reminder ${reminder.id} — marked completed');
+        continue;
+      }
       final doc = docMap[reminder.documentId];
-      if (doc == null) continue;
+      if (doc == null) {
+        // DEBUG: REMOVE BEFORE RELEASE
+        skippedNoDoc++;
+        debugPrint('DEBUG:   Skipping reminder ${reminder.id} — no matching document (documentId=${reminder.documentId})');
+        continue;
+      }
       await scheduleReminder(reminder, doc.title);
+      // DEBUG: REMOVE BEFORE RELEASE
+      scheduled++;
     }
+
+    // DEBUG: REMOVE BEFORE RELEASE
+    debugPrint('DEBUG: rescheduleAllReminders() finished — attempted=$scheduled, skippedCompleted=$skippedCompleted, skippedNoDoc=$skippedNoDoc');
+  }
+
+  // DEBUG: REMOVE BEFORE RELEASE
+  Future<void> showTestNotification() async {
+    debugPrint('DEBUG: Attempting immediate test notification');
+    await _plugin.show(
+      0,
+      'DocSafe Test',
+      'If you see this, notifications are working',
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'docsafe_reminders',
+          'Document Reminders',
+          channelDescription: 'Reminders for document deadlines',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
+    debugPrint('DEBUG: plugin.show() completed');
+  }
+
+  // DEBUG: REMOVE BEFORE RELEASE
+  Future<void> showScheduledTestNotification() async {
+    final now = tz.TZDateTime.now(tz.local);
+    final fireDate = now.add(const Duration(minutes: 1));
+    debugPrint('DEBUG: Scheduling test notification for $fireDate');
+
+    await _plugin.zonedSchedule(
+      99999,
+      'DocSafe Scheduled Test',
+      'Scheduled notification is working',
+      fireDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'docsafe_reminders',
+          'Document Reminders',
+          channelDescription: 'Reminders for document deadlines',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+    debugPrint('DEBUG: zonedSchedule() completed for $fireDate');
   }
 
   /// Converts a reminder UUID string to a stable non-negative int suitable
