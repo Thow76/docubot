@@ -91,7 +91,7 @@ class NotificationService {
     try {
       await _plugin.zonedSchedule(
         _reminderNotificationId(reminder.id),
-        'DocSafe Reminder',
+        'DocuBot Reminder',
         '$documentTitle — ${reminder.contextReason}',
         scheduledDate,
         _notificationDetails,
