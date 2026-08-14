@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('DocSafe'),
+              const Text('DocuBot'),
               Text(
                 '${documentProvider.documents.length} documents',
                 style: Theme.of(context).textTheme.bodyMedium,

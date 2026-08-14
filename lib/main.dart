@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DocSafe',
+      title: 'DocuBot',
       theme: appTheme,
       home: const HomeScreen(),
       routes: {
