@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # .env is git-ignored (holds a real API key) but declared as a Flutter
+      # asset in pubspec.yaml, so flutter analyze/test need it to exist.
+      # Content is irrelevant here: nothing in analyze or the current test
+      # suite reads the actual key.
+      - run: touch .env
+
+      - run: flutter pub get
+
+      - run: flutter analyze
+
+      - run: flutter test
