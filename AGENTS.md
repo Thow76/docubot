@@ -71,7 +71,10 @@ flutter test              # unit/widget tests
 flutter build apk --debug # Android debug build
 ```
 
-There is no CI yet (that's T-004) — run these locally before opening a PR.
+CI (`.github/workflows/ci.yml`) runs `flutter analyze` and `flutter test` on
+every push/PR to `main` — but `main` has no branch protection requiring it to
+pass (an explicit, deliberate decision; see issue #4), so still run these
+locally before opening a PR rather than relying on CI to catch it first.
 
 ## Conventions
 
